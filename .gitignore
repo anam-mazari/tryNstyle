@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+e-store-front-end/node_modules/
+e-store-back-end/node_modules/
+
+# Environment files — NEVER commit these, contain secrets
+.env
+.env.local
+.env.production
+.env*.local
+
+# Next.js build output
+e-store-front-end/.next/
+
+# Python cache
+e-store-ai/__pycache__/
+e-store-ai/*.pyc
+
+# AI model — too large for GitHub (over 100MB limit)
+e-store-ai/best_model.keras
+
+# Logs
+*.log
+npm-debug.log*
