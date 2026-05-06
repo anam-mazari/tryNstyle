@@ -3,7 +3,7 @@ import { seedCategories } from './category.seed';
 
 async function runSeed() {
   const ds = await datasource.initialize();
-  
+
   try {
     console.log('Starting category seed...');
     await seedCategories(ds);
@@ -17,5 +17,3 @@ async function runSeed() {
 }
 
 runSeed();
-
-

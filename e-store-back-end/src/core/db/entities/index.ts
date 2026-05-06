@@ -23,5 +23,3 @@ export const entities: EntityClassOrSchema[] = [
   Brand,
   PendingCheckout,
 ];
-
-

@@ -9,7 +9,9 @@ import { product } from 'src/core/db/entities/product';
 import { User } from 'src/core/db/entities/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, CartItem, product, User, OrderItem])],
+  imports: [
+    TypeOrmModule.forFeature([Order, CartItem, product, User, OrderItem]),
+  ],
   controllers: [OrdersController],
   providers: [OrdersService],
   exports: [OrdersService],

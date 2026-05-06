@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'cart-Item' })
 export class CartItem {
@@ -14,7 +20,7 @@ export class CartItem {
   @Column({ type: 'varchar', nullable: false })
   userId!: string;
 
-  @Column({ type: 'varchar',  })
+  @Column({ type: 'varchar' })
   price!: number;
 
   @Column({ type: 'int', default: 1 })
@@ -28,9 +34,6 @@ export class CartItem {
   @Column({ type: 'varchar', length: 255, nullable: true })
   brand!: string | null;
 
- @Column({ type: 'text', nullable: true })
-   imageUrl!: string | null;
-  
+  @Column({ type: 'text', nullable: true })
+  imageUrl!: string | null;
 }
-
-

@@ -1,6 +1,15 @@
 import {
-  Body, Controller, Delete, Get, Param, Patch, Post, Query,
-  UploadedFile, UseInterceptors, BadRequestException
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -8,7 +17,10 @@ import { v2 as cloudinary } from 'cloudinary';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ProductService } from 'src/core/services/product/product.service';
-import { CreateProductDto, UpdateProductDto } from 'src/core/services/product/create-product.dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+} from 'src/core/services/product/create-product.dto';
 import { ListProductsQueryDto } from 'src/core/services/product/list-products-query.dto';
 
 const GLB_OUTPUT_DIR = process.env.GLB_OUTPUT_DIR || '/app/public/models';
@@ -54,7 +66,10 @@ export class ProductController {
       storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
-          return cb(new BadRequestException('Only image files are allowed'), false);
+          return cb(
+            new BadRequestException('Only image files are allowed'),
+            false,
+          );
         }
         cb(null, true);
       },
@@ -65,13 +80,17 @@ export class ProductController {
     if (!file) throw new BadRequestException('No file uploaded');
 
     const result = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        { folder: 'estore/products' },
-        (error, result) => {
-          if (error) reject(new BadRequestException('Cloudinary upload failed: ' + error.message));
+      cloudinary.uploader
+        .upload_stream({ folder: 'estore/products' }, (error, result) => {
+          if (error)
+            reject(
+              new BadRequestException(
+                'Cloudinary upload failed: ' + error.message,
+              ),
+            );
           else resolve(result);
-        }
-      ).end(file.buffer);
+        })
+        .end(file.buffer);
     });
 
     return { imageUrl: result.secure_url };
@@ -94,7 +113,12 @@ export class ProductController {
       storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         if (!file.mimetype.match(/\/(png|webp)$/)) {
-          return cb(new BadRequestException('Only PNG or WebP files allowed for lens images'), false);
+          return cb(
+            new BadRequestException(
+              'Only PNG or WebP files allowed for lens images',
+            ),
+            false,
+          );
         }
         cb(null, true);
       },
@@ -105,19 +129,26 @@ export class ProductController {
     if (!file) throw new BadRequestException('No lens PNG file uploaded');
 
     const result = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          folder: 'estore/lenses',
-          // Preserve transparency for PNG
-          format: 'png',
-          // Resize to standard 512x512 if larger
-          transformation: [{ width: 512, height: 512, crop: 'limit' }],
-        },
-        (error, result) => {
-          if (error) reject(new BadRequestException('Cloudinary upload failed: ' + error.message));
-          else resolve(result);
-        }
-      ).end(file.buffer);
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: 'estore/lenses',
+            // Preserve transparency for PNG
+            format: 'png',
+            // Resize to standard 512x512 if larger
+            transformation: [{ width: 512, height: 512, crop: 'limit' }],
+          },
+          (error, result) => {
+            if (error)
+              reject(
+                new BadRequestException(
+                  'Cloudinary upload failed: ' + error.message,
+                ),
+              );
+            else resolve(result);
+          },
+        )
+        .end(file.buffer);
     });
 
     return { lensImageUrl: result.secure_url };
@@ -129,12 +160,16 @@ export class ProductController {
     FileInterceptor('file', {
       storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
-        const isGlb = file.mimetype === 'model/gltf-binary'
-          || file.mimetype === 'application/octet-stream'
-          || file.originalname.endsWith('.glb')
-          || file.originalname.endsWith('.gltf');
+        const isGlb =
+          file.mimetype === 'model/gltf-binary' ||
+          file.mimetype === 'application/octet-stream' ||
+          file.originalname.endsWith('.glb') ||
+          file.originalname.endsWith('.gltf');
         if (!isGlb) {
-          return cb(new BadRequestException('Only GLB/GLTF files are allowed'), false);
+          return cb(
+            new BadRequestException('Only GLB/GLTF files are allowed'),
+            false,
+          );
         }
         cb(null, true);
       },

@@ -7,11 +7,7 @@ export class AdminController {
 
   @Post()
   create(@Body() body: any) {
-    return this.adminService.createAdmin(
-      body.name,
-      body.email,
-      body.password,
-    );
+    return this.adminService.createAdmin(body.name, body.email, body.password);
   }
 
   @Post('login')

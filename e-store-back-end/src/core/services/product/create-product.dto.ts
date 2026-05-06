@@ -1,5 +1,14 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
 import { FrameWidth } from 'src/core/enums/frame-width.enum';
 import { ColorVariantImageDto } from 'src/core/services/product/color-variant-image.dto';
 

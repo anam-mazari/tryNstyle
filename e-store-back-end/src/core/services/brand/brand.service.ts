@@ -15,9 +15,9 @@ export class BrandService {
   }
 
   async findOne(id: string) {
-    const brand = await this.brandRepository.findOne({ 
+    const brand = await this.brandRepository.findOne({
       where: { id },
-      relations: ['products']
+      relations: ['products'],
     });
     if (!brand) throw new NotFoundException('Brand not found');
     return brand;
@@ -32,7 +32,12 @@ export class BrandService {
     return await this.brandRepository.save(brand);
   }
 
-  async update(id: string, name?: string, description?: string, logoUrl?: string) {
+  async update(
+    id: string,
+    name?: string,
+    description?: string,
+    logoUrl?: string,
+  ) {
     const brand = await this.brandRepository.findOneBy({ id });
     if (!brand) throw new NotFoundException('Brand not found');
 
@@ -49,5 +54,3 @@ export class BrandService {
     return this.brandRepository.remove(brand);
   }
 }
-
-

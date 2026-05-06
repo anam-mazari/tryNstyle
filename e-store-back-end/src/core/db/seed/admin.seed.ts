@@ -3,7 +3,7 @@ import { Admin } from '../entities/admin';
 import * as bcrypt from 'bcryptjs';
 
 async function seedAdmin() {
-  const ds = await datasource.initialize();   // <-- FIX: rename variable
+  const ds = await datasource.initialize(); // <-- FIX: rename variable
   const adminRepo = ds.getRepository(Admin);
 
   // Check if admin already exists

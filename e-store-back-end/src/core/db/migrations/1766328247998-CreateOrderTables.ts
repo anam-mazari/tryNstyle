@@ -1,11 +1,11 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateOrderTables1766328247998 implements MigrationInterface {
-    name = 'CreateOrderTables1766328247998'
+  name = 'CreateOrderTables1766328247998';
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create orders table
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    // Create orders table
+    await queryRunner.query(`
             CREATE TABLE "orders" (
                 "order_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "total_amount" numeric(10,2) NOT NULL,
@@ -20,8 +20,8 @@ export class CreateOrderTables1766328247998 implements MigrationInterface {
             )
         `);
 
-        // Create order_items table
-        await queryRunner.query(`
+    // Create order_items table
+    await queryRunner.query(`
             CREATE TABLE "order_items" (
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "quantity" integer NOT NULL,
@@ -33,11 +33,10 @@ export class CreateOrderTables1766328247998 implements MigrationInterface {
                 CONSTRAINT "FK_order_items_productId" FOREIGN KEY ("productId") REFERENCES "product"("id") ON DELETE SET NULL
             )
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE "order_items"`);
-        await queryRunner.query(`DROP TABLE "orders"`);
-    }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE "order_items"`);
+    await queryRunner.query(`DROP TABLE "orders"`);
+  }
 }
-

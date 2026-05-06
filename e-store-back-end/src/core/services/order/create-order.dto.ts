@@ -14,6 +14,10 @@ export class OrderItemDto {
   @IsNotEmpty()
   product_id: string;
 
+  @IsString()
+  @IsOptional()
+  variant_color?: string;
+
   @IsNumber()
   @Min(1)
   quantity: number;

@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Category } from './category.entity';
 import { Brand } from './brand.entity';
 
@@ -49,7 +57,9 @@ export class product {
   imageUrl!: string | null;
 
   @Column({ type: 'jsonb', nullable: true })
-  colorVariantImages!: { color: string; imageUrl: string }[] | null;
+  colorVariantImages!:
+    | { color: string; imageUrl: string; stockQuantity?: number }[]
+    | null;
 
   @Column({ type: 'text', nullable: true })
   glbUrl!: string | null;

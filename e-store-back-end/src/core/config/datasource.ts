@@ -10,5 +10,3 @@ export default new DataSource({
     isLocal ? 'src/core/db/migrations/*.ts' : 'dist/core/db/migrations/*.js',
   ],
 });
-
-

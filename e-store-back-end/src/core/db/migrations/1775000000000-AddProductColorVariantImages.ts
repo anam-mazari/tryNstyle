@@ -10,6 +10,8 @@ export class AddProductColorVariantImages1775000000000 implements MigrationInter
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "colorVariantImages"`);
+    await queryRunner.query(
+      `ALTER TABLE "product" DROP COLUMN "colorVariantImages"`,
+    );
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+} from '@nestjs/common';
 import { BrandService } from 'src/core/services/brand/brand.service';
 
 @Controller('brands')
@@ -16,7 +24,9 @@ export class BrandController {
   }
 
   @Post()
-  create(@Body() body: { name: string; description?: string; logoUrl?: string }) {
+  create(
+    @Body() body: { name: string; description?: string; logoUrl?: string },
+  ) {
     return this.brandService.create(body.name, body.description, body.logoUrl);
   }
 
@@ -25,7 +35,12 @@ export class BrandController {
     @Param('id') id: string,
     @Body() body: { name?: string; description?: string; logoUrl?: string },
   ) {
-    return this.brandService.update(id, body.name, body.description, body.logoUrl);
+    return this.brandService.update(
+      id,
+      body.name,
+      body.description,
+      body.logoUrl,
+    );
   }
 
   @Delete(':id')
@@ -33,5 +48,3 @@ export class BrandController {
     return this.brandService.remove(id);
   }
 }
-
-

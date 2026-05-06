@@ -1,10 +1,33 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { UserService } from '../../core/services/users/user.service';
-import type { CreateUserDto, UpdateUserDto } from '../../core/services/users/user.service';
+import type {
+  CreateUserDto,
+  UpdateUserDto,
+} from '../../core/services/users/user.service';
+import { RegisterCustomerDto } from './dto/register-customer.dto';
+import { LoginCustomerDto } from './dto/login-customer.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Post('register')
+  registerCustomer(@Body() body: RegisterCustomerDto) {
+    return this.userService.registerCustomer(body);
+  }
+
+  @Post('login')
+  loginCustomer(@Body() body: LoginCustomerDto) {
+    return this.userService.loginCustomer(body);
+  }
 
   @Get()
   findAll() {
@@ -31,5 +54,3 @@ export class UserController {
     return this.userService.remove(id);
   }
 }
-
-

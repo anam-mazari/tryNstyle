@@ -22,10 +22,18 @@ export class OrderShippingAddressFields1774000000000 implements MigrationInterfa
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "shipping_country"`);
-    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "shipping_postal_code"`);
-    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "shipping_province"`);
+    await queryRunner.query(
+      `ALTER TABLE "orders" DROP COLUMN "shipping_country"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "orders" DROP COLUMN "shipping_postal_code"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "orders" DROP COLUMN "shipping_province"`,
+    );
     await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "shipping_city"`);
-    await queryRunner.query(`ALTER TABLE "orders" DROP COLUMN "shipping_address_line2"`);
+    await queryRunner.query(
+      `ALTER TABLE "orders" DROP COLUMN "shipping_address_line2"`,
+    );
   }
 }

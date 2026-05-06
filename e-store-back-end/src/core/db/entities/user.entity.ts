@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class User {
@@ -14,7 +20,7 @@ export class User {
   @Column({ type: 'varchar', nullable: false })
   username!: string;
 
-  @Column({ type: 'varchar',  })
+  @Column({ type: 'varchar' })
   email!: string;
 
   @Column({ type: 'varchar', length: 30, nullable: true })
@@ -22,6 +28,13 @@ export class User {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   address!: string | null;
+
+  /** Bcrypt hash; null for checkout-created guests until they register with the same email. */
+  @Column({
+    name: 'password_hash',
+    type: 'varchar',
+    nullable: true,
+    select: false,
+  })
+  passwordHash!: string | null;
 }
-
-

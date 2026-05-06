@@ -10,5 +10,3 @@ import { UserService } from '../../core/services/users/user.service';
   exports: [UserService],
 })
 export class UserModule {}
-
-

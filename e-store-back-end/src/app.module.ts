@@ -8,6 +8,7 @@ import { OrdersModule } from './feature/order/order.module';
 import { PaymentModule } from './feature/payment/payment.module';
 import { CategoryModule } from './feature/category/category.module';
 import { BrandModule } from './feature/brand/brand.module';
+import { SalesReportsModule } from './feature/sales-reports/sales-reports.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { BrandModule } from './feature/brand/brand.module';
     ProductModule,
     AdminModule,
     OrdersModule,
+    SalesReportsModule,
     PaymentModule,
     CategoryModule,
     BrandModule,

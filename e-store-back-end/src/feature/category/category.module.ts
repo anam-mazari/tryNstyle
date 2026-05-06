@@ -11,5 +11,3 @@ import { CategoryController } from './category.controller';
   exports: [CategoryService],
 })
 export class CategoryModule {}
-
-

@@ -9,4 +9,3 @@ export const ITypeOrmModule = TypeOrmModule.forRoot({
 });
 
 export const ITypeOrmModuleFeatures = TypeOrmModule.forFeature(entities);
-

@@ -15,9 +15,9 @@ export class CategoryService {
   }
 
   async findOne(id: string) {
-    const category = await this.categoryRepository.findOne({ 
+    const category = await this.categoryRepository.findOne({
       where: { id },
-      relations: ['products']
+      relations: ['products'],
     });
     if (!category) throw new NotFoundException('Category not found');
     return category;
@@ -32,13 +32,19 @@ export class CategoryService {
     return await this.categoryRepository.save(category);
   }
 
-  async update(id: string, name?: string, description?: string, parentCategoryId?: string) {
+  async update(
+    id: string,
+    name?: string,
+    description?: string,
+    parentCategoryId?: string,
+  ) {
     const category = await this.categoryRepository.findOneBy({ id });
     if (!category) throw new NotFoundException('Category not found');
 
     if (name !== undefined) category.name = name;
     if (description !== undefined) category.description = description;
-    if (parentCategoryId !== undefined) category.parentCategoryId = parentCategoryId;
+    if (parentCategoryId !== undefined)
+      category.parentCategoryId = parentCategoryId;
 
     return await this.categoryRepository.save(category);
   }
@@ -49,5 +55,3 @@ export class CategoryService {
     return this.categoryRepository.remove(category);
   }
 }
-
-

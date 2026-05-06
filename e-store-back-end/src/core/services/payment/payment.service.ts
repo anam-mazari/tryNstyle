@@ -35,7 +35,8 @@ export class PaymentService {
   private readonly stripe: Stripe;
 
   constructor(
-    @InjectRepository(Payment) private readonly paymentRepo: Repository<Payment>,
+    @InjectRepository(Payment)
+    private readonly paymentRepo: Repository<Payment>,
     @InjectRepository(Order) private readonly orderRepo: Repository<Order>,
     @InjectRepository(PendingCheckout)
     private readonly pendingCheckoutRepo: Repository<PendingCheckout>,
@@ -48,9 +49,13 @@ export class PaymentService {
   /**
    * Stripe Checkout first: no order until payment succeeds (webhook creates order + payment).
    */
-  async createStripeCheckoutSession(dto: CreateOrderDto): Promise<{ url: string }> {
+  async createStripeCheckoutSession(
+    dto: CreateOrderDto,
+  ): Promise<{ url: string }> {
     if (!getStripeSecretKey()) {
-      throw new BadRequestException('Stripe is not configured (STRIPE_SECRET_KEY)');
+      throw new BadRequestException(
+        'Stripe is not configured (STRIPE_SECRET_KEY)',
+      );
     }
     if (!STRIPE_HOSTED_CHECKOUT_METHODS.has(dto.payment_method)) {
       throw new BadRequestException(
@@ -58,7 +63,8 @@ export class PaymentService {
       );
     }
 
-    const total_amount = await this.ordersService.validateItemsAndComputeTotal(dto);
+    const total_amount =
+      await this.ordersService.validateItemsAndComputeTotal(dto);
     const totalStr = total_amount.toFixed(2);
 
     const checkout_payload: PendingCheckout['checkout_payload'] = {
@@ -180,7 +186,7 @@ export class PaymentService {
     }
 
     if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
+      const session = event.data.object;
       await this.fulfillCheckoutSession(session);
     }
 
@@ -196,7 +202,9 @@ export class PaymentService {
     order?: Order;
   }> {
     if (!getStripeSecretKey()) {
-      throw new BadRequestException('Stripe is not configured (STRIPE_SECRET_KEY)');
+      throw new BadRequestException(
+        'Stripe is not configured (STRIPE_SECRET_KEY)',
+      );
     }
 
     const existingPayment = await this.paymentRepo.findOne({
@@ -228,7 +236,9 @@ export class PaymentService {
       await this.fulfillCheckoutSession(session);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Fulfillment threw for session ${sessionId}: ${message}`);
+      this.logger.error(
+        `Fulfillment threw for session ${sessionId}: ${message}`,
+      );
       return { status: 'failed' };
     }
 
@@ -294,7 +304,12 @@ export class PaymentService {
       return fromTotal;
     }
     const pi = session.payment_intent;
-    if (typeof pi === 'object' && pi !== null && 'amount' in pi && typeof pi.amount === 'number') {
+    if (
+      typeof pi === 'object' &&
+      pi !== null &&
+      'amount' in pi &&
+      typeof pi.amount === 'number'
+    ) {
       return pi.amount;
     }
     return 0;
@@ -303,7 +318,7 @@ export class PaymentService {
   private async resolvePaidAmountCentsWithFallback(
     session: Stripe.Checkout.Session,
   ): Promise<number> {
-    let paid = this.resolvePaidAmountCents(session);
+    const paid = this.resolvePaidAmountCents(session);
     if (paid > 0) {
       return paid;
     }
@@ -343,9 +358,7 @@ export class PaymentService {
 
     const formEmail = payload.email?.trim() || '';
     const stripeEmail =
-      details?.email?.trim() ||
-      session.customer_email?.trim() ||
-      '';
+      details?.email?.trim() || session.customer_email?.trim() || '';
     const email = formEmail || stripeEmail;
 
     const formUsername = payload.username?.trim() || '';
@@ -367,7 +380,9 @@ export class PaymentService {
     return { username, email: emailResolved, phone };
   }
 
-  private async fulfillCheckoutSession(session: Stripe.Checkout.Session): Promise<void> {
+  private async fulfillCheckoutSession(
+    session: Stripe.Checkout.Session,
+  ): Promise<void> {
     const existing = await this.paymentRepo.findOne({
       where: { transaction_id: session.id },
     });
@@ -393,9 +408,12 @@ export class PaymentService {
 
     let resolvedSession: Stripe.Checkout.Session;
     try {
-      resolvedSession = await this.stripe.checkout.sessions.retrieve(session.id, {
-        expand: ['payment_intent'],
-      });
+      resolvedSession = await this.stripe.checkout.sessions.retrieve(
+        session.id,
+        {
+          expand: ['payment_intent'],
+        },
+      );
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       this.logger.error(
@@ -422,7 +440,10 @@ export class PaymentService {
     }
 
     const payload = pending.checkout_payload;
-    const fromStripe = this.resolveCustomerFromStripeSession(resolvedSession, payload);
+    const fromStripe = this.resolveCustomerFromStripeSession(
+      resolvedSession,
+      payload,
+    );
     const createDto: CreateOrderDto = {
       username: fromStripe.username,
       email: fromStripe.email,
@@ -457,7 +478,9 @@ export class PaymentService {
       await this.pendingCheckoutRepo.save(pending);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      this.logger.error(`Failed to create order after Stripe payment: ${message}`);
+      this.logger.error(
+        `Failed to create order after Stripe payment: ${message}`,
+      );
       pending.status = PendingCheckoutStatus.FAILED;
       await this.pendingCheckoutRepo.save(pending);
       throw err;
@@ -486,7 +509,9 @@ export class PaymentService {
       return { status: 'failed' };
     }
 
-    throw new NotFoundException('Checkout session not found or already expired');
+    throw new NotFoundException(
+      'Checkout session not found or already expired',
+    );
   }
 
   async updatePaymentStatus(

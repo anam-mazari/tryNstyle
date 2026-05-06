@@ -15,7 +15,11 @@ export class AdminService {
     return this.adminRepo.find();
   }
 
-  async createAdmin(name: string, email: string, password: string): Promise<Admin> {
+  async createAdmin(
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<Admin> {
     const hashed = await bcrypt.hash(password, 10);
 
     const admin = this.adminRepo.create({
@@ -27,9 +31,12 @@ export class AdminService {
     return this.adminRepo.save(admin);
   }
 
-  async login(email: string, password: string): Promise<{ admin: Omit<Admin, 'password'>; token?: string }> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ admin: Omit<Admin, 'password'>; token?: string }> {
     const admin = await this.adminRepo.findOne({ where: { email } });
-    
+
     if (!admin) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -39,14 +46,14 @@ export class AdminService {
     }
 
     const isPasswordValid = await bcrypt.compare(password, admin.password);
-    
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password');
     }
 
     // Return admin without password
     const { password: _, ...adminWithoutPassword } = admin;
-    
+
     return {
       admin: adminWithoutPassword,
       // Note: In a real app, you'd generate a JWT token here
