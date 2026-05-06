@@ -16,8 +16,8 @@ export default function DashboardPage() {
   return (
     <>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-600">Welcome back, {user?.name || user?.email}!</p>
+        <h1 className="text-3xl font-bold text-[#2c241c]">Dashboard</h1>
+        <p className="mt-2 text-stone-600">Welcome back, {user?.name || user?.email}!</p>
       </div>
 
       {/* Stats Overview */}
@@ -53,8 +53,17 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="mb-8">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Quick Actions</h2>
+        <h2 className="mb-4 text-xl font-semibold text-[#2c241c]">Quick Actions</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            href="/dashboard/sales"
+            className="rounded-lg border border-stone-200/80 bg-[#fcfaf6] p-6 shadow-sm transition-shadow hover:border-stone-300 hover:shadow-md"
+          >
+            <h3 className="text-lg font-medium text-[#2c241c]">Sales</h3>
+            <p className="mt-2 text-sm text-stone-600">
+              Revenue chart and pending vs cancelled by period
+            </p>
+          </Link>
           <Link
             href="/dashboard/products"
             className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
@@ -66,19 +75,19 @@ export default function DashboardPage() {
           </Link>
           <Link
             href="/dashboard/orders"
-            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+            className="rounded-lg border border-stone-200/80 bg-[#fcfaf6] p-6 shadow-sm transition-shadow hover:border-stone-300 hover:shadow-md"
           >
-            <h3 className="text-lg font-medium text-gray-900">Manage Orders</h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <h3 className="text-lg font-medium text-[#2c241c]">Manage Orders</h3>
+            <p className="mt-2 text-sm text-stone-600">
               View and process customer orders
             </p>
           </Link>
           <Link
             href="/dashboard/users"
-            className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+            className="rounded-lg border border-stone-200/80 bg-[#fcfaf6] p-6 shadow-sm transition-shadow hover:border-stone-300 hover:shadow-md"
           >
-            <h3 className="text-lg font-medium text-gray-900">Manage Users</h3>
-            <p className="mt-2 text-sm text-gray-600">
+            <h3 className="text-lg font-medium text-[#2c241c]">Manage Users</h3>
+            <p className="mt-2 text-sm text-stone-600">
               View and manage user accounts
             </p>
           </Link>
@@ -87,48 +96,48 @@ export default function DashboardPage() {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">Recent Orders</h2>
-        <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold text-[#2c241c]">Recent Orders</h2>
+        <div className="rounded-lg border border-stone-200/80 bg-[#fcfaf6] shadow-sm">
           {ordersLoading ? (
-            <div className="p-8 text-center text-gray-500">Loading orders...</div>
+            <div className="p-8 text-center text-stone-500">Loading orders...</div>
           ) : orders && orders.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-stone-200/80">
+                <thead className="bg-[#ebe4d9]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-600">
                       Order ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-600">
                       Items
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-600">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-600">
                       Total
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-stone-600">
                       Date
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="divide-y divide-stone-200/80 bg-[#fcfaf6]">
                   {orders.slice(0, 5).map((order) => (
                     <tr key={order.order_id}>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-[#2c241c]">
                         {order.order_id.substring(0, 8)}...
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">
                         <OrderLineThumbnails items={order.items ?? []} max={3} size={36} />
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-600">
                         <OrderStatusBadge status={order.order_status} />
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-600">
                         ${Number(order.total_amount).toFixed(2)}
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                      <td className="whitespace-nowrap px-6 py-4 text-sm text-stone-600">
                         {new Date(order.created_at).toLocaleDateString()}
                       </td>
                     </tr>
@@ -137,7 +146,7 @@ export default function DashboardPage() {
               </table>
             </div>
           ) : (
-            <div className="p-8 text-center text-gray-500">No orders yet</div>
+            <div className="p-8 text-center text-stone-500">No orders yet</div>
           )}
         </div>
       </div>

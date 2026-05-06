@@ -44,7 +44,9 @@ function buildLensSwatches(product: Product) {
     swatches.push({
       hex:      product.frameColor.startsWith('#') ? product.frameColor : '#888888',
       name:     product.frameStyle || product.frameColor,
-      imageUrl: product.imageUrl || '',
+      // Lens products often have `lensImageUrl` (overlay PNG) but no `imageUrl`.
+      // Use `lensImageUrl` as a reasonable card thumbnail fallback.
+      imageUrl: product.imageUrl || product.lensImageUrl || '',
     });
   }
 
@@ -82,7 +84,9 @@ export function LensProductCard({ product }: LensProductCardProps) {
     setActiveLensName(swatches[0]?.name ?? 'Default');
   }, [product.id, swatches]);
 
-  const activeImageUrl = resolveProductImageUrl(swatches[activeIndex]?.imageUrl ?? product.imageUrl);
+  const activeImageUrl = resolveProductImageUrl(
+    swatches[activeIndex]?.imageUrl ?? product.imageUrl ?? product.lensImageUrl,
+  );
   const price          = Number(product.price);
   const displayPrice   = Number.isFinite(price) ? price.toFixed(0) : '—';
 

@@ -2,33 +2,38 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
-import { LoginForm } from '@/features/auth/components/LoginForm';
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store/store';
+import { CustomerLoginForm } from '@/features/auth/components/CustomerLoginForm';
 
-export default function LoginPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+export default function CustomerLoginPage() {
+  const customerAuth = useSelector((state: RootState) => state.customerAuth);
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push('/dashboard');
+    if (!customerAuth.isLoading && customerAuth.isAuthenticated) {
+      router.push('/profile');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [
+    customerAuth.isAuthenticated,
+    customerAuth.isLoading,
+    router,
+  ]);
 
-  if (isLoading) {
+  if (customerAuth.isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-300 border-r-gray-900"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="mb-4 inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-300 border-r-gray-900" />
+          <p className="text-gray-600">Loading…</p>
         </div>
       </div>
     );
   }
 
-  if (isAuthenticated) {
-    return null; // Will redirect
+  if (customerAuth.isAuthenticated) {
+    return null;
   }
 
   return (
@@ -36,23 +41,28 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Admin Login
+            Sign in
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to access the admin dashboard
+            Use your customer account to view your profile and orders.
           </p>
         </div>
-        <LoginForm />
-        <div className="text-center">
+        <CustomerLoginForm />
+        <div className="space-y-2 text-center text-sm">
           <Link
             href="/"
-            className="text-sm font-medium text-gray-900 hover:text-gray-700"
+            className="block font-medium text-gray-900 hover:text-gray-700"
           >
-            ← Back to products
+            ← Back to store
+          </Link>
+          <Link
+            href="/admin/login"
+            className="block text-gray-500 hover:text-gray-700"
+          >
+            Store administrator login
           </Link>
         </div>
       </div>
     </div>
   );
 }
-

@@ -32,6 +32,7 @@ interface ProductFormProps {
 interface ExtraColorFormRow {
   id: string;
   color: string;
+  stockQuantity: string;
   file: File | null;
   remoteUrl: string;
   previewDataUrl: string;
@@ -125,6 +126,7 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
         variantExtras.map((v) => ({
           id: crypto.randomUUID(),
           color: v.color,
+          stockQuantity: String(v.stockQuantity ?? 0),
           file: null,
           remoteUrl: v.imageUrl,
           previewDataUrl: '',
@@ -173,7 +175,17 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
   };
 
   const addExtraColorRow = (): void => {
-    setExtraColors((rows) => [...rows, { id: crypto.randomUUID(), color: '', file: null, remoteUrl: '', previewDataUrl: '' }]);
+    setExtraColors((rows) => [
+      ...rows,
+      {
+        id: crypto.randomUUID(),
+        color: '',
+        stockQuantity: '0',
+        file: null,
+        remoteUrl: '',
+        previewDataUrl: '',
+      },
+    ]);
   };
 
   const removeExtraColorRow = (rowId: string): void => {
@@ -184,8 +196,28 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
     setExtraColors((rows) => rows.map((row) => (row.id === rowId ? { ...row, color } : row)));
   };
 
+  const updateExtraColorStock = (rowId: string, stockQuantity: string): void => {
+    setExtraColors((rows) =>
+      rows.map((row) => (row.id === rowId ? { ...row, stockQuantity } : row)),
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate extra color rows so admins don't think they're saved when they were skipped.
+    for (const row of extraColors) {
+      const color = row.color.trim();
+      const hasImage = Boolean(row.file) || row.remoteUrl.trim().length > 0;
+      if (color.length === 0 && hasImage) {
+        setUploadError('Please enter a color name for each extra color image you upload.');
+        return;
+      }
+      if (color.length > 0 && !hasImage) {
+        setUploadError('Please upload an image for each extra color you add.');
+        return;
+      }
+    }
 
     let finalImageUrl = formData.imageUrl;
     if (imageFile) {
@@ -227,7 +259,8 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
         imageUrl = uploaded;
       }
       if (!imageUrl) continue;
-      builtVariants.push({ color, imageUrl });
+      const stockQuantity = Math.max(0, parseInt(row.stockQuantity, 10) || 0);
+      builtVariants.push({ color, imageUrl, stockQuantity });
     }
 
     const productData: CreateProductDto | UpdateProductDto = {
@@ -265,13 +298,16 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <Input label="Price" type="number" step="0.01" required value={formData.price}
-        onChange={(e) => setFormData({ ...formData, price: e.target.value })} id="price" name="price" />
+        onChange={(e) => setFormData({ ...formData, price: e.target.value })} id="price" name="price"
+        placeholder="e.g. 129.99" />
 
       <Input label="Stock Quantity" type="number" min="0" required value={formData.stockQuantity}
-        onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })} id="stockQuantity" name="stockQuantity" />
+        onChange={(e) => setFormData({ ...formData, stockQuantity: e.target.value })} id="stockQuantity" name="stockQuantity"
+        placeholder="e.g. 10" />
 
       <Input label="Brand" type="text" value={formData.brand}
-        onChange={(e) => setFormData({ ...formData, brand: e.target.value })} id="brand" name="brand" />
+        onChange={(e) => setFormData({ ...formData, brand: e.target.value })} id="brand" name="brand"
+        placeholder="e.g. Ray-Ban, TrynStyle" />
 
       <div>
         <Input label='Category (type "Contact Lenses" for lens products)' type="text" value={formData.category}
@@ -330,14 +366,17 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
       {!isLens && (
         <>
           <Input label="Frame Style" type="text" value={formData.frameStyle}
-            onChange={(e) => setFormData({ ...formData, frameStyle: e.target.value })} id="frameStyle" name="frameStyle" />
+            onChange={(e) => setFormData({ ...formData, frameStyle: e.target.value })} id="frameStyle" name="frameStyle"
+            placeholder="e.g. Rectangular, Aviator, Cat-eye" />
           <Input label="Frame Color (primary)" type="text" value={formData.frameColor}
-            onChange={(e) => setFormData({ ...formData, frameColor: e.target.value })} id="frameColor" name="frameColor" />
+            onChange={(e) => setFormData({ ...formData, frameColor: e.target.value })} id="frameColor" name="frameColor"
+            placeholder="e.g. Black, Silver, Tortoise, #1a1a1a" />
           <Input label="Shape" type="text" value={formData.shape}
             onChange={(e) => setFormData({ ...formData, shape: e.target.value })}
             id="shape" name="shape" placeholder="e.g. Round, Square, Cat-eye" />
           <Input label="Material" type="text" value={formData.material}
-            onChange={(e) => setFormData({ ...formData, material: e.target.value })} id="material" name="material" />
+            onChange={(e) => setFormData({ ...formData, material: e.target.value })} id="material" name="material"
+            placeholder="e.g. Acetate, Metal, Titanium" />
           <Select label="Frame width" id="frameWidth" name="frameWidth" value={formData.frameWidth}
             onChange={(e) => setFormData({ ...formData, frameWidth: e.target.value })}
             options={FRAME_WIDTH_SELECT_OPTIONS} />
@@ -408,14 +447,29 @@ export function ProductForm({ product, onSubmit, onCancel, isLoading = false }: 
           </div>
           {extraColors.length === 0 && <p className="text-sm text-gray-500">No extra colors yet.</p>}
           {extraColors.map((row) => (
-            <div key={row.id} className="flex flex-col gap-3 rounded-md border border-gray-200 bg-white p-3 sm:flex-row sm:items-end">
-              <div className="min-w-0 flex-1">
+            <div
+              key={row.id}
+              className="grid grid-cols-1 gap-3 rounded-md border border-gray-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_11rem_1fr] sm:items-end"
+            >
+              <div className="min-w-0">
                 <Input label="Color name" type="text" value={row.color}
                   onChange={(e) => updateExtraColorLabel(row.id, e.target.value)}
                   id={`extra-color-${row.id}`} name={`extra-color-${row.id}`}
                   placeholder="e.g. Tortoise" />
               </div>
-              <div className="flex flex-1 flex-wrap items-center gap-3">
+              <div className="min-w-0">
+                <Input
+                  label="Stock"
+                  type="number"
+                  min="0"
+                  value={row.stockQuantity}
+                  onChange={(e) => updateExtraColorStock(row.id, e.target.value)}
+                  id={`extra-color-stock-${row.id}`}
+                  name={`extra-color-stock-${row.id}`}
+                  placeholder="e.g. 5"
+                />
+              </div>
+              <div className="flex min-w-0 flex-wrap items-center gap-3">
                 {(row.previewDataUrl || row.remoteUrl) && (
                   <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded border border-gray-200 bg-gray-50">
                     {/* eslint-disable-next-line @next/next/no-img-element */}

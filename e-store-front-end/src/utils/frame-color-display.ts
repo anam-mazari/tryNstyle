@@ -30,7 +30,12 @@ export function getFrameColorCss(frameColor: string | null | undefined): string 
   if (!frameColor?.trim()) {
     return '#d1d5db';
   }
-  const key = frameColor.trim().toLowerCase();
+  const trimmed = frameColor.trim();
+  // Support hex codes directly (e.g. #fff, #ffffff, #ffffffff)
+  if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(trimmed)) {
+    return trimmed;
+  }
+  const key = trimmed.toLowerCase();
   if (COLOR_MAP[key]) {
     return COLOR_MAP[key];
   }

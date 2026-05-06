@@ -11,7 +11,7 @@ export function Navbar() {
   const pathname = usePathname();
   const cart = useSelector((state: RootState) => state.cart);
   const favorites = useSelector((state: RootState) => state.favorites);
-  const auth = useSelector((state: RootState) => state.auth);
+  const customerAuth = useSelector((state: RootState) => state.customerAuth);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -116,7 +116,7 @@ export function Navbar() {
             </Link>
 
             <div className="ml-0.5 flex items-center border-l border-neutral-200 pl-2 sm:ml-1 sm:pl-3">
-              {mounted && auth.isAuthenticated && auth.user ? (
+              {mounted && customerAuth.isAuthenticated && customerAuth.user ? (
                 <Link
                   href="/profile"
                   className="max-w-[100px] truncate text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 sm:max-w-none"

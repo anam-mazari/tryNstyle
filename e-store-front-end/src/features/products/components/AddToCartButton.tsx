@@ -8,14 +8,23 @@ import toast from 'react-hot-toast';
 
 interface AddToCartButtonProps {
   product: Product;
+  maxQtyOverride?: number;
+  unavailableLabel?: string;
+  variantColor?: string;
   className?: string;
 }
 
-export function AddToCartButton({ product, className = '' }: AddToCartButtonProps) {
+export function AddToCartButton({
+  product,
+  maxQtyOverride,
+  unavailableLabel = 'Unavailable',
+  variantColor,
+  className = '',
+}: AddToCartButtonProps) {
   const dispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
 
-  const maxQty = Math.max(0, product.stockQuantity);
+  const maxQty = Math.max(0, maxQtyOverride ?? product.stockQuantity);
   const unavailable = maxQty === 0;
 
   useEffect(() => {
@@ -36,7 +45,7 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
     }
 
     const qty = clampQty(quantity);
-    dispatch(addToCart({ product, quantity: qty }));
+    dispatch(addToCart({ product, quantity: qty, variantColor }));
     toast.success(qty === 1 ? 'Added to cart' : `Added ${qty} to cart`);
   };
 
@@ -85,7 +94,7 @@ export function AddToCartButton({ product, className = '' }: AddToCartButtonProp
         disabled={unavailable}
         className="min-h-[2.75rem] flex-1 rounded-xl bg-neutral-900 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {unavailable ? 'Unavailable' : 'Add to cart'}
+        {unavailable ? unavailableLabel : 'Add to cart'}
       </button>
     </div>
   );

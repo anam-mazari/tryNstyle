@@ -35,6 +35,8 @@ interface SkinToneResult  { skin_tone: "Warm"|"Cool"|"Neutral"; best_colors: str
 export interface GlassesColorVariant {
   color:    string;
   imageUrl: string | null;
+  stockQuantity?: number;
+  isPrimary?: boolean;
 }
 
 interface TryOnProps {
@@ -293,10 +295,17 @@ export default function TryOn({
   }, [captureFrame]);
 
   const handleAddToCart = useCallback(() => {
-    if ((product as any).stockQuantity === 0) { toast.error("Out of stock."); return; }
-    dispatch(addToCart({ product: product as any, quantity: 1 }));
+    const active = colorVariants[activeVariantIndex];
+    const maxQty =
+      typeof active?.stockQuantity === "number"
+        ? Math.max(0, active.stockQuantity)
+        : (product as any).stockQuantity;
+    if (maxQty === 0) { toast.error("Out of stock."); return; }
+    const variantColor =
+      active && active.isPrimary ? undefined : active?.color;
+    dispatch(addToCart({ product: product as any, quantity: 1, variantColor }));
     toast.success("Added to cart!");
-  }, [dispatch, product]);
+  }, [activeVariantIndex, colorVariants, dispatch, product]);
 
   useEffect(() => { return () => { stopTracking(); if (animRef.current) cancelAnimationFrame(animRef.current); }; }, [stopTracking]);
 

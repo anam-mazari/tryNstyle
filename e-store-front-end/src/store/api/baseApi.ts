@@ -12,8 +12,29 @@ export const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     prepareHeaders: (headers) => {
-      // Add any default headers here (e.g., authorization tokens)
       headers.set('Content-Type', 'application/json');
+      if (typeof window !== 'undefined') {
+        try {
+          const raw = localStorage.getItem('customerAuth');
+          if (raw) {
+            const parsed: unknown = JSON.parse(raw);
+            if (
+              typeof parsed === 'object' &&
+              parsed !== null &&
+              'user' in parsed &&
+              typeof (parsed as { user?: { id?: unknown } }).user?.id ===
+                'string'
+            ) {
+              headers.set(
+                'X-Customer-User-Id',
+                (parsed as { user: { id: string } }).user.id,
+              );
+            }
+          }
+        } catch {
+          /* ignore malformed customerAuth */
+        }
+      }
       return headers;
     },
   }),

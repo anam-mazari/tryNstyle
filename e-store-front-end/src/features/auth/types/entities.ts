@@ -18,6 +18,7 @@ export interface ProductCategoryRef {
 export interface ProductColorVariantImage {
   color: string;
   imageUrl: string;
+  stockQuantity?: number;
 }
 
 export interface User {

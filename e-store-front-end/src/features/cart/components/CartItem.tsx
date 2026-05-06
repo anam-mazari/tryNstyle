@@ -15,19 +15,36 @@ interface CartItemProps {
 
 function buildDetailLines(product: CartItemType['product']): string[] {
   const lines: string[] = [];
+  const addLine = (raw: string): void => {
+    const trimmed = raw.trim();
+    if (!trimmed || lines.includes(trimmed)) {
+      return;
+    }
+    lines.push(trimmed);
+  };
   if (product.frameStyle?.trim()) {
-    lines.push(product.frameStyle.trim());
+    addLine(product.frameStyle);
   }
   if (product.frameColor?.trim()) {
-    lines.push(`Color: ${product.frameColor.trim()}`);
+    addLine(`Color: ${product.frameColor.trim()}`);
   }
   if (product.shape?.trim()) {
-    lines.push(product.shape.trim());
+    addLine(product.shape);
   }
   if (product.material?.trim()) {
-    lines.push(product.material.trim());
+    addLine(product.material);
   }
   return lines;
+}
+
+function getCartThumbnailUrl(product: CartItemType['product']): string | null {
+  const primary = product.imageUrl ?? null;
+  const variantImage =
+    Array.isArray(product.colorVariantImages) && product.colorVariantImages.length > 0
+      ? product.colorVariantImages[0]?.imageUrl ?? null
+      : null;
+  const lensFallback = product.lensImageUrl ?? null;
+  return resolveProductImageUrl(primary ?? variantImage ?? lensFallback);
 }
 
 export function CartItem({ item }: CartItemProps) {
@@ -36,19 +53,25 @@ export function CartItem({ item }: CartItemProps) {
   const brandLabel = getProductBrandName(product.brand);
   const categoryLabel = getProductCategoryName(product.category);
   const title = brandLabel || categoryLabel || 'Product';
-  const imageSrc = resolveProductImageUrl(product.imageUrl);
+  const imageSrc = getCartThumbnailUrl(product);
   const detailLines = buildDetailLines(product);
   const unitPrice = Number(product.price);
   const lineTotal = unitPrice * item.quantity;
 
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity <= 0) {
-      dispatch(removeFromCart(product.id));
+      dispatch(removeFromCart({ productId: product.id, variantColor: item.variantColor }));
       toast.success('Item removed from cart');
     } else if (newQuantity > product.stockQuantity) {
       toast.error("You've reached the maximum quantity for this item.");
     } else {
-      dispatch(updateQuantity({ productId: product.id, quantity: newQuantity }));
+      dispatch(
+        updateQuantity({
+          productId: product.id,
+          quantity: newQuantity,
+          variantColor: item.variantColor,
+        }),
+      );
     }
   };
 
@@ -91,8 +114,8 @@ export function CartItem({ item }: CartItemProps) {
             ) : null}
             {detailLines.length > 0 ? (
               <ul className="mt-2 space-y-1 text-sm text-neutral-600">
-                {detailLines.map((line) => (
-                  <li key={line}>{line}</li>
+                {detailLines.map((line, lineIndex) => (
+                  <li key={`${lineIndex}-${line}`}>{line}</li>
                 ))}
               </ul>
             ) : null}
@@ -132,7 +155,12 @@ export function CartItem({ item }: CartItemProps) {
             <button
               type="button"
               onClick={() => {
-                dispatch(removeFromCart(product.id));
+                dispatch(
+                  removeFromCart({
+                    productId: product.id,
+                    variantColor: item.variantColor,
+                  }),
+                );
                 toast.success('Item removed from cart');
               }}
               className="mt-1 text-sm font-medium text-red-600 transition hover:text-red-700"

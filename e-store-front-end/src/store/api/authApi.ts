@@ -1,5 +1,5 @@
 import { baseApi } from './baseApi';
-import type { Admin } from '@/types/entities';
+import type { Admin, User } from '@/types/entities';
 
 export interface LoginRequest {
   email: string;
@@ -11,6 +11,18 @@ export interface LoginResponse {
   token?: string;
 }
 
+export interface CustomerRegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  phone?: string | null;
+  address?: string | null;
+}
+
+export interface CustomerAuthResponse {
+  user: User;
+}
+
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     loginAdmin: builder.mutation<LoginResponse, LoginRequest>({
@@ -20,10 +32,33 @@ export const authApi = baseApi.injectEndpoints({
         body: credentials,
       }),
     }),
+    loginCustomer: builder.mutation<CustomerAuthResponse, LoginRequest>({
+      query: (credentials) => ({
+        url: '/users/login',
+        method: 'POST',
+        body: credentials,
+      }),
+      invalidatesTags: ['Order'],
+    }),
+    registerCustomer: builder.mutation<
+      CustomerAuthResponse,
+      CustomerRegisterRequest
+    >({
+      query: (body) => ({
+        url: '/users/register',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Order'],
+    }),
   }),
 });
 
-export const { useLoginAdminMutation } = authApi;
+export const {
+  useLoginAdminMutation,
+  useLoginCustomerMutation,
+  useRegisterCustomerMutation,
+} = authApi;
 
 
 

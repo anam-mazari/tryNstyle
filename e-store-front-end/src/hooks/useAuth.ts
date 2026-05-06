@@ -30,7 +30,7 @@ export function useAuth() {
 
   const logout = () => {
     dispatch(clearUser());
-    router.push('/login');
+    router.push('/admin/login');
   };
 
   return {

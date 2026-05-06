@@ -11,7 +11,7 @@ export default function AdminOrdersPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
         <p className="mt-2 text-gray-600">
-          Order status is set automatically from checkout and payment (for example: pending, paid).
+          Status updates automatically as the order moves through checkout and payment (e.g., pending → paid → delivered).
         </p>
       </div>
 

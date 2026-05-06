@@ -56,6 +56,7 @@ export interface UpdateProductDto {
 // Order DTOs
 export interface OrderItemDto {
   product_id: string;
+  variant_color?: string;
   quantity: number;
 }
 

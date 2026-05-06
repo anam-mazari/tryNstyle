@@ -4,6 +4,8 @@ import type { Product } from '@/types/entities';
 export interface CartItem {
   product: Product;
   quantity: number;
+  /** Selected color variant label (undefined/empty means primary variant). */
+  variantColor?: string;
 }
 
 interface CartState {
@@ -48,14 +50,26 @@ const cartSlice = createSlice({
     total: calculateTotal(initialState.items),
   },
   reducers: {
-    addToCart: (state, action: PayloadAction<{ product: Product; quantity?: number }>) => {
-      const { product, quantity = 1 } = action.payload;
-      const existingItem = state.items.find((item) => item.product.id === product.id);
+    addToCart: (
+      state,
+      action: PayloadAction<{
+        product: Product;
+        quantity?: number;
+        variantColor?: string;
+      }>,
+    ) => {
+      const { product, quantity = 1, variantColor } = action.payload;
+      const normalizedVariantColor = variantColor?.trim() || undefined;
+      const existingItem = state.items.find(
+        (item) =>
+          item.product.id === product.id &&
+          (item.variantColor?.trim() || undefined) === normalizedVariantColor,
+      );
 
       if (existingItem) {
         existingItem.quantity += quantity;
       } else {
-        state.items.push({ product, quantity });
+        state.items.push({ product, quantity, variantColor: normalizedVariantColor });
       }
 
       state.total = calculateTotal(state.items);
@@ -65,8 +79,18 @@ const cartSlice = createSlice({
         localStorage.setItem('cart', JSON.stringify({ items: state.items, total: state.total }));
       }
     },
-    removeFromCart: (state, action: PayloadAction<string>) => {
-      state.items = state.items.filter((item) => item.product.id !== action.payload);
+    removeFromCart: (
+      state,
+      action: PayloadAction<{ productId: string; variantColor?: string }>,
+    ) => {
+      const normalizedVariantColor = action.payload.variantColor?.trim() || undefined;
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item.product.id === action.payload.productId &&
+            (item.variantColor?.trim() || undefined) === normalizedVariantColor
+          ),
+      );
       state.total = calculateTotal(state.items);
 
       // Persist to localStorage
@@ -74,13 +98,27 @@ const cartSlice = createSlice({
         localStorage.setItem('cart', JSON.stringify({ items: state.items, total: state.total }));
       }
     },
-    updateQuantity: (state, action: PayloadAction<{ productId: string; quantity: number }>) => {
+    updateQuantity: (
+      state,
+      action: PayloadAction<{ productId: string; quantity: number; variantColor?: string }>,
+    ) => {
       const { productId, quantity } = action.payload;
-      const item = state.items.find((item) => item.product.id === productId);
+      const normalizedVariantColor = action.payload.variantColor?.trim() || undefined;
+      const item = state.items.find(
+        (entry) =>
+          entry.product.id === productId &&
+          (entry.variantColor?.trim() || undefined) === normalizedVariantColor,
+      );
 
       if (item) {
         if (quantity <= 0) {
-          state.items = state.items.filter((item) => item.product.id !== productId);
+          state.items = state.items.filter(
+            (entry) =>
+              !(
+                entry.product.id === productId &&
+                (entry.variantColor?.trim() || undefined) === normalizedVariantColor
+              ),
+          );
         } else {
           item.quantity = quantity;
         }

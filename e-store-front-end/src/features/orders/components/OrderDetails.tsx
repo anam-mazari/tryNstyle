@@ -4,7 +4,8 @@ import { Card } from '@/components/ui/Card';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderProductThumbnail } from './OrderProductThumbnail';
 import type { Order } from '@/types/entities';
-import { getProductBrandName, getProductCategoryName } from '@/utils/product-labels';
+import { getOrderLineDisplayName } from '@/utils/product-labels';
+import { getOrderLinePrimaryImageUrl } from '@/utils/product-color-variants';
 
 interface OrderDetailsProps {
   order: Order;
@@ -36,16 +37,8 @@ function formatShippingAddress(order: Order): string[] {
 
 export function OrderDetails({ order }: OrderDetailsProps) {
   const addressLines = formatShippingAddress(order);
-  const productLabel = (item: (typeof order.items)[0]) => {
-    const p = item.product;
-    if (!p) return 'Product';
-    return (
-      p.frameStyle ||
-      getProductBrandName(p.brand) ||
-      getProductCategoryName(p.category) ||
-      'Product'
-    );
-  };
+  const productLabel = (item: (typeof order.items)[0]) =>
+    getOrderLineDisplayName(item.product ?? undefined);
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -59,7 +52,7 @@ export function OrderDetails({ order }: OrderDetailsProps) {
               >
                 <div className="flex min-w-0 flex-1 items-center gap-4">
                   <OrderProductThumbnail
-                    imageUrl={item.product?.imageUrl ?? null}
+                    imageUrl={getOrderLinePrimaryImageUrl(item.product ?? undefined)}
                     alt={productLabel(item)}
                     size={72}
                   />

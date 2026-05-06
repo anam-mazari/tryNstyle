@@ -8,6 +8,7 @@ import { clearCart } from '@/store/slices/cartSlice';
 import { useSyncStripeSessionMutation } from '@/store/api/paymentsApi';
 import type { StripeSessionOrderResponse } from '@/types/api';
 import { getRtkErrorMessage } from '@/utils/get-rtk-error-message';
+import { getProductBrandName, getProductCategoryName } from '@/utils/product-labels';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
@@ -137,6 +138,20 @@ function CheckoutSuccessContent() {
   }
 
   if (result?.status === 'complete' && result.order) {
+    const itemLabels =
+      result.order.items?.map((item) => {
+        const product = item.product;
+        if (!product) {
+          return 'Product';
+        }
+        return (
+          product.frameStyle ||
+          getProductBrandName(product.brand) ||
+          getProductCategoryName(product.category) ||
+          'Product'
+        );
+      }) ?? [];
+    const uniqueItemLabels = Array.from(new Set(itemLabels.filter(Boolean)));
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-gray-900">Thank you!</h1>
@@ -144,6 +159,15 @@ function CheckoutSuccessContent() {
           Order <span className="font-mono text-sm">{result.order.order_id}</span> is paid and
           confirmed.
         </p>
+        {uniqueItemLabels.length > 0 ? (
+          <p className="mt-3 text-sm text-gray-600">
+            Items:{' '}
+            <span className="font-medium text-gray-900">
+              {uniqueItemLabels.slice(0, 4).join(', ')}
+              {uniqueItemLabels.length > 4 ? '…' : ''}
+            </span>
+          </p>
+        ) : null}
         <Link
           href="/profile/orders"
           className="mt-8 inline-block rounded-md bg-gray-900 px-6 py-3 text-white hover:bg-gray-800"

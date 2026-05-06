@@ -2,15 +2,17 @@
 
 import Image from 'next/image';
 import type { Product } from '@/types/entities';
-import { getProductBrandName } from '@/utils/product-labels';
+import { getOrderLineDisplayName } from '@/utils/product-labels';
+import { getOrderLinePrimaryImageUrl } from '@/utils/product-color-variants';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 function resolveImageSrc(imageUrl: string | null | undefined): string | null {
-  if (!imageUrl) {
+  const trimmed = imageUrl?.trim();
+  if (!trimmed) {
     return null;
   }
-  return imageUrl.startsWith('http') ? imageUrl : `${API_BASE}${imageUrl}`;
+  return trimmed.startsWith('http') ? trimmed : `${API_BASE}${trimmed}`;
 }
 
 interface OrderProductThumbnailProps {
@@ -56,9 +58,7 @@ export function OrderProductThumbnail({
 }
 
 interface OrderLineThumbnailsProps {
-  items: {
-    product?: Pick<Product, 'imageUrl' | 'brand' | 'frameStyle'> | null;
-  }[];
+  items: { id: string; product?: Product | null }[];
   max?: number;
   size?: number;
 }
@@ -76,15 +76,13 @@ export function OrderLineThumbnails({ items, max = 3, size = 40 }: OrderLineThum
 
   return (
     <div className="flex flex-wrap items-center gap-1" aria-label="Order line preview images">
-      {slice.map((line, index) => {
-        const label =
-          line.product?.frameStyle ||
-          getProductBrandName(line.product?.brand ?? null) ||
-          `Item ${index + 1}`;
+      {slice.map((line) => {
+        const label = getOrderLineDisplayName(line.product ?? undefined);
+        const resolvedUrl = getOrderLinePrimaryImageUrl(line.product ?? undefined);
         return (
           <OrderProductThumbnail
-            key={index}
-            imageUrl={line.product?.imageUrl ?? null}
+            key={line.id}
+            imageUrl={resolvedUrl}
             alt={label}
             size={size}
           />

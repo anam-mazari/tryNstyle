@@ -14,6 +14,7 @@ import {
   type ProductSortOption,
 } from '@/features/products/utils/product-filter-logic';
 import type { Product } from '@/types/entities';
+import { getProductCategoryName } from '@/utils/product-labels';
 
 function sortProducts(products: Product[], sort: ProductSortOption): Product[] {
   const copy = [...products];
@@ -97,6 +98,12 @@ export default function ProductsPage() {
     () => productsForCurrentFilters ?? [],
     [productsForCurrentFilters],
   );
+  const productsExcludingLenses = useMemo(() => {
+    return products.filter((product) => {
+      const categoryName = getProductCategoryName(product.category) ?? '';
+      return categoryName.toLowerCase() !== 'contact lenses';
+    });
+  }, [products]);
   const productsListPending =
     !productsQueryError &&
     productsForCurrentFilters === undefined &&
@@ -105,11 +112,11 @@ export default function ProductsPage() {
   const isLoading = filterMetaLoading || productsListPending;
 
   const sortedProducts = useMemo(
-    () => sortProducts(products, sortOption),
-    [products, sortOption],
+    () => sortProducts(productsExcludingLenses, sortOption),
+    [productsExcludingLenses, sortOption],
   );
 
-  const hasProducts = products.length > 0;
+  const hasProducts = productsExcludingLenses.length > 0;
   const filterReturnedEmpty =
     !isLoading && !hasProducts && filterMeta !== undefined && !productsQueryError;
 

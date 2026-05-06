@@ -1,72 +1,66 @@
-'use client';
-
 import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="border-t border-stone-800/60 bg-[#2a221c] text-[#c9c0b4]">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          {/* Company Info */}
           <div>
-            <h3 className="mb-4 text-lg font-semibold text-white">TrynStyle</h3>
-            <p className="text-sm">
+            <h3 className="mb-4 text-lg font-semibold text-[#faf8f4]">TrynStyle</h3>
+            <p className="text-sm text-[#c9c0b4]">
               Your trusted destination for premium products and exceptional service.
             </p>
           </div>
 
-          {/* Quick Links */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">Quick Links</h4>
+            <h4 className="mb-4 text-sm font-semibold text-[#ece7df]">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/" className="hover:text-white">
+                <Link href="/" className="transition hover:text-[#faf8f4]">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="hover:text-white">
+                <Link href="/products" className="transition hover:text-[#faf8f4]">
                   Shop
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" className="hover:text-white">
+                <Link href="/favorites" className="transition hover:text-[#faf8f4]">
                   Favorites
                 </Link>
               </li>
               <li>
-                <Link href="/cart" className="hover:text-white">
+                <Link href="/cart" className="transition hover:text-[#faf8f4]">
                   Cart
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Customer Service */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">Customer Service</h4>
+            <h4 className="mb-4 text-sm font-semibold text-[#ece7df]">Customer Service</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/profile/orders" className="hover:text-white">
+                <Link href="/profile/orders" className="transition hover:text-[#faf8f4]">
                   Order History
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="transition hover:text-[#faf8f4]">
                   Contact Us
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white">
+                <a href="#" className="transition hover:text-[#faf8f4]">
                   FAQ
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">Contact</h4>
+            <h4 className="mb-4 text-sm font-semibold text-[#ece7df]">Contact</h4>
             <ul className="space-y-2 text-sm">
               <li>Email: support@trynstyle.com</li>
               <li>Phone: +1 (555) 123-4567</li>
@@ -74,7 +68,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-800 pt-8 text-center text-sm">
+        <div className="mt-8 border-t border-stone-700/50 pt-8 text-center text-sm text-[#a8a095]">
           <p>&copy; {new Date().getFullYear()} TrynStyle. All rights reserved.</p>
         </div>
       </div>

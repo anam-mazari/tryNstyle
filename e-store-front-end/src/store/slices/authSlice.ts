@@ -7,38 +7,16 @@ interface AuthState {
   isLoading: boolean;
 }
 
-// Load initial state from localStorage
-const loadAuthFromStorage = (): AuthState => {
-  if (typeof window === 'undefined') {
-    return {
-      user: null,
-      isAuthenticated: false,
-      isLoading: false,
-    };
-  }
-
-  try {
-    const stored = localStorage.getItem('auth');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      return {
-        user: parsed.user,
-        isAuthenticated: !!parsed.user,
-        isLoading: false,
-      };
-    }
-  } catch (error) {
-    console.error('Error loading auth from localStorage:', error);
-  }
-
-  return {
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-  };
+/**
+ * Important for SSR/hydration:
+ * Do NOT read `localStorage` at module init time, or server/client will render different HTML.
+ * The client hydrates auth state after mount (see `AppProviders`).
+ */
+const initialState: AuthState = {
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
 };
-
-const initialState: AuthState = loadAuthFromStorage();
 
 const authSlice = createSlice({
   name: 'auth',
@@ -67,10 +45,19 @@ const authSlice = createSlice({
     setLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
     },
+    hydrateFromStorage: (
+      state,
+      action: PayloadAction<{ user: Omit<Admin, 'password'> | null }>,
+    ) => {
+      state.user = action.payload.user;
+      state.isAuthenticated = Boolean(action.payload.user);
+      state.isLoading = false;
+    },
   },
 });
 
-export const { setUser, clearUser, setLoading } = authSlice.actions;
+export const { setUser, clearUser, setLoading, hydrateFromStorage } =
+  authSlice.actions;
 export default authSlice.reducer;
 
 

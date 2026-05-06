@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store/store';
 import { clearCart } from '@/store/slices/cartSlice';
@@ -37,6 +37,7 @@ const isCashOnDelivery = (method: string): boolean => method === 'cash_on_delive
 
 export default function CheckoutPage() {
   const cart = useSelector((state: RootState) => state.cart);
+  const customerAuth = useSelector((state: RootState) => state.customerAuth);
   const dispatch = useDispatch();
   const router = useRouter();
   const [createOrder, { isLoading: isCreatingOrder }] = useCreateOrderMutation();
@@ -59,6 +60,23 @@ export default function CheckoutPage() {
   });
 
   const [phoneError, setPhoneError] = useState<string>('');
+
+  const lockedAccountEmail = useMemo((): string | null => {
+    if (!customerAuth.isAuthenticated || !customerAuth.user?.email) {
+      return null;
+    }
+    return customerAuth.user.email.trim().toLowerCase();
+  }, [customerAuth.isAuthenticated, customerAuth.user?.email]);
+
+  useEffect(() => {
+    if (!lockedAccountEmail) {
+      return;
+    }
+    setFormData((previous) => ({
+      ...previous,
+      email: lockedAccountEmail,
+    }));
+  }, [lockedAccountEmail]);
 
   if (!cart.items || cart.items.length === 0) {
     return (
@@ -98,6 +116,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (lockedAccountEmail && formData.email.trim().toLowerCase() !== lockedAccountEmail) {
+      toast.error('Checkout email must match your signed-in account email.');
+      return;
+    }
+
     const checkoutPayload = {
       username: formData.username,
       email: formData.email,
@@ -111,11 +134,15 @@ export default function CheckoutPage() {
       payment_method: formData.payment_method,
       items: cart.items.map((item) => ({
         product_id: item.product.id,
+        variant_color: item.variantColor,
         quantity: item.quantity,
       })),
     };
 
     try {
+      if (typeof window !== 'undefined' && !customerAuth.isAuthenticated) {
+        localStorage.setItem('guestCheckoutEmail', formData.email.trim().toLowerCase());
+      }
       if (isCashOnDelivery(formData.payment_method)) {
         const order = await createOrder(checkoutPayload).unwrap();
         await createPayment({
@@ -202,8 +229,15 @@ export default function CheckoutPage() {
                 placeholder="Your email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                readOnly={Boolean(lockedAccountEmail)}
+                aria-readonly={Boolean(lockedAccountEmail)}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm placeholder:text-gray-400 focus:border-gray-900 focus:outline-none focus:ring-gray-900 sm:text-sm"
               />
+              {lockedAccountEmail ? (
+                <p className="mt-1 text-xs text-gray-500">
+                  Using your account email: <span className="font-medium">{lockedAccountEmail}</span>
+                </p>
+              ) : null}
             </div>
 
             <div>

@@ -35,6 +35,10 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   const selectedVariant = colorVariants[selectedVariantIndex];
   const displayImageUrl = resolveProductImageUrl(selectedVariant?.imageUrl ?? product.imageUrl);
   const selectedColorLabel = selectedVariant?.color ?? product.frameColor;
+  const selectedStockQuantity = selectedVariant?.stockQuantity ?? Math.max(0, product.stockQuantity);
+  const isSelectedUnavailable = selectedStockQuantity <= 0;
+  const selectedVariantColorForCart =
+    selectedVariant && !selectedVariant.isPrimary ? selectedVariant.color : undefined;
 
   const headline = brandLabel || categoryLabel || 'Product';
 
@@ -128,7 +132,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
         </div>
 
         <div className="mb-10">
-          <AddToCartButton product={product} />
+          <AddToCartButton
+            product={product}
+            maxQtyOverride={selectedStockQuantity}
+            unavailableLabel={isSelectedUnavailable ? 'Out of stock' : 'Unavailable'}
+            variantColor={selectedVariantColorForCart}
+          />
         </div>
 
         <div className="mt-auto rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
